@@ -1,0 +1,8 @@
+name = "mirror"
+main = "index.js"
+
+workers_dev = true
+compatibility_date = "2023-02-22"
+routes = [
+	{ pattern = "cf-proxy.pandada8.de", custom_domain = true },
+]
