@@ -21,22 +21,22 @@ async function fetchAndApply(request) {
     return fetch(ret)
   }
   const target = new URL("https://huggingface.co" + url.pathname)
-  const req = new Request(target, {headers: request.headers})
-  const firstResponse = await fetch(req, {
-    method: 'HEAD',
-    redirect: 'manual',
-  })
+  const req = new Request(target, {headers: request.headers, method: 'HEAD', redirect: 'manual'})
+  const firstResponse = await fetch(req)
+  console.log(firstResponse.status)
   if (firstResponse.status == 302) {
-    console.debug(firstResponse)
     const location = new URL(firstResponse.headers.get('location'))
     const newLocation = `https://${url.hostname}/___FIX_HEADER/${location.hostname}${location.pathname}${location.search}`
-    console.log(firstResponse.headers['x-repo-commit'])
+    let headers = {}
+    for (const [key, value] of firstResponse.headers) {
+      if (key != 'location' && key != 'access-control-allow-origin' ) {
+        headers[key] = value
+      }
+    }
+    headers['location'] = newLocation
     return new Response(null, {
       status: 302,
-      headers: {
-        ...firstResponse.headers,
-        location: newLocation,
-      },
+      headers: headers,
     })
   } else {
     return fetch(req, {
